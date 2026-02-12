@@ -1021,6 +1021,7 @@ function createMiniSudoku() {
     selected: -1,
     done: false,
     layout: null,
+    invalid: new Set(),
   };
 
   function reset(level = 1) {
@@ -1034,6 +1035,7 @@ function createMiniSudoku() {
     state.selected = -1;
     state.done = false;
     state.layout = null;
+    state.invalid = new Set();
   }
 
   function update(dt, keys, settings, store) {
@@ -1047,11 +1049,8 @@ function createMiniSudoku() {
       state.grid[state.selected] = 0;
     }
     if (keys.has('r')) reset(state.level);
-    if (checkWin()) {
-      state.done = true;
-      store.saveRecord('sudoku', Math.max(store.getRecord('sudoku'), Math.floor((state.level / 3) * 100)));
-      showOverlay(i18n.t('pass'), i18n.t('pass_level', { n: state.level }), { showNext: state.level < 3, showExit: true });
-    }
+    updateInvalids();
+    checkSudokuComplete();
   }
 
   function onClick(x, y) {
@@ -1069,6 +1068,8 @@ function createMiniSudoku() {
       const value = layout.padValues[idx];
       if (value != null && state.selected >= 0 && !state.fixed[state.selected]) {
         state.grid[state.selected] = value;
+        updateInvalids();
+        checkSudokuComplete();
       }
     }
   }
@@ -1083,21 +1084,23 @@ function createMiniSudoku() {
         const i = r * state.size + c;
         const px = layout.gridX + c * layout.cell;
         const py = layout.gridY + r * layout.cell;
-        ctx.fillStyle = state.selected === i ? '#1e293b' : '#0f172a';
+        const isBad = state.invalid.has(i);
+        ctx.fillStyle = isBad ? '#ffd6e7' : state.selected === i ? '#ffe1ef' : '#fff7fb';
         ctx.fillRect(px, py, layout.cell, layout.cell);
         ctx.strokeRect(px, py, layout.cell, layout.cell);
         const v = state.grid[i];
         if (v) {
-          ctx.fillStyle = 'rgba(255,255,255,0.15)';
+          ctx.fillStyle = 'rgba(255, 122, 182, 0.18)';
           ctx.font = `${Math.floor(layout.cell * 0.45)}px "Courier New", monospace`;
           ctx.fillText(emojiFor(v), px + layout.cell * 0.15, py + layout.cell * 0.75);
-          ctx.fillStyle = state.fixed[i] ? '#facc15' : '#e2e8f0';
+          ctx.fillStyle = state.fixed[i] ? '#e11d48' : '#7c2d12';
           ctx.font = `${layout.font}px "Courier New", monospace`;
           ctx.fillText(String(v), px + layout.textX, py + layout.textY);
         }
       }
     }
 
+    ctx.strokeStyle = '#f7b7d2';
     drawSudokuGridLines(ctx, layout, state.box);
     drawNumberPad(ctx, layout);
     drawHud(ctx, `关卡: ${state.level}  规模: ${state.size}x${state.size}`);
@@ -1109,6 +1112,28 @@ function createMiniSudoku() {
 
   function checkWin() {
     return isComplete(state.grid, state.size, state.box);
+  }
+
+  function checkSudokuComplete() {
+    if (!isFilled(state.grid)) return;
+    if (checkWin()) {
+      state.done = true;
+      store.saveRecord('sudoku', Math.max(store.getRecord('sudoku'), Math.floor((state.level / 3) * 100)));
+      showOverlay(i18n.t('pass'), i18n.t('pass_level', { n: state.level }), { showNext: state.level < 3, showExit: true });
+    } else {
+      // keep editable, only highlight errors
+    }
+  }
+
+  function updateInvalids() {
+    state.invalid = new Set();
+    for (let i = 0; i < state.grid.length; i++) {
+      const v = state.grid[i];
+      if (!v) continue;
+      if (!isValid(state.grid, state.size, state.box, i, v)) {
+        state.invalid.add(i);
+      }
+    }
   }
 
   function levelConfig(level) {
@@ -1123,14 +1148,14 @@ function createMiniSudoku() {
     const cell = Math.floor(gridSize / state.size);
     const actualGrid = cell * state.size;
     const gridX = Math.floor((canvas.width - actualGrid) / 2);
-    const gridY = 80;
     const padCols = Math.min(state.size, 5);
     const padRows = Math.ceil((state.size + 1) / padCols);
     const padCell = 44;
     const padW = padCols * padCell;
     const padH = padRows * padCell;
     const padX = Math.floor((canvas.width - padW) / 2);
-    const padY = gridY + actualGrid + 20;
+    const gridY = padH + 24;
+    const padY = 10;
     const values = [];
     for (let i = 1; i <= state.size; i++) values.push(i);
     values.push(0);
@@ -1232,10 +1257,10 @@ function createMemoryMatch() {
         const x = layout.x + c * layout.cell;
         const y = layout.y + r * layout.cell;
         const faceUp = state.flipped.includes(idx) || state.matched.has(idx);
-        ctx.fillStyle = faceUp ? '#facc15' : '#1f2937';
+        ctx.fillStyle = faceUp ? '#ffd6e7' : '#ffeef7';
         ctx.fillRect(x + 4, y + 4, layout.cell - 8, layout.cell - 8);
         if (faceUp) {
-          ctx.fillStyle = '#0f172a';
+          ctx.fillStyle = '#7c2d12';
           ctx.font = `${Math.floor(layout.cell * 0.4)}px "Courier New", monospace`;
           ctx.fillText(symbolFor(state.grid[idx]), x + layout.cell * 0.35, y + layout.cell * 0.6);
         }
@@ -1693,8 +1718,8 @@ function drawPixelSprite(ctx, x, y, sprite, scale, palette) {
 }
 
 function drawHud(ctx, text) {
-  ctx.fillStyle = '#e2e8f0';
-  ctx.font = '14px "Courier New", monospace';
+  ctx.fillStyle = '#7c2d12';
+  ctx.font = '15px "Courier New", monospace';
   ctx.fillText(text, 20, 30);
 }
 
@@ -1823,6 +1848,7 @@ function createI18n() {
       not_enough: '条件未達成',
       fail_lives: 'ライフがなくなりました。リトライしてね。',
       fail_moves: '手数オーバー。もう一度！',
+      fail_sudoku: '数独が間違っています。もう一度！',
       pass_level: '第 {n} ステージ クリア！',
       pass_shape: '{shape} を完成したよ！',
       need_mush: 'キノコが足りないよ。必要 {need}、今 {got}。',
@@ -1868,6 +1894,7 @@ function createI18n() {
       not_enough: '未达标',
       fail_lives: '生命耗尽，按“重开”重新开始。',
       fail_moves: '步数过多，按“重开”再试。',
+      fail_sudoku: '数独答案有误，请再检查。',
       pass_level: '完成第 {n} 关！',
       pass_shape: '恭喜你完成了{shape}！',
       need_mush: '还需采集蘑菇 {need} 个，当前 {got} 个。',
@@ -1913,6 +1940,7 @@ function createI18n() {
       not_enough: 'Not enough',
       fail_lives: 'Out of lives. Try again.',
       fail_moves: 'Too many moves. Try again.',
+      fail_sudoku: 'Sudoku is incorrect. Try again.',
       pass_level: 'Stage {n} cleared!',
       pass_shape: 'You completed the {shape}!',
       need_mush: 'Need {need} mushrooms, now {got}.',
@@ -2067,9 +2095,9 @@ function drawNumberPad(ctx, layout) {
     const row = Math.floor(i / layout.padCols);
     const x = layout.padX + col * layout.padCell;
     const y = layout.padY + row * layout.padCell;
-    ctx.fillStyle = '#1f2937';
+    ctx.fillStyle = '#fff0f7';
     ctx.fillRect(x, y, layout.padCell - 2, layout.padCell - 2);
-    ctx.fillStyle = '#e2e8f0';
+    ctx.fillStyle = '#7c2d12';
     const label = v === 0 ? '清' : String(v);
     ctx.fillText(label, x + 14, y + 24);
   }
@@ -2157,9 +2185,37 @@ function isValid(grid, size, box, idx, val) {
 }
 
 function isComplete(grid, size, box) {
-  for (let i = 0; i < grid.length; i++) {
-    if (grid[i] === 0) return false;
-    if (!isValid(grid, size, box, i, grid[i])) return false;
+  for (let r = 0; r < size; r++) {
+    const seen = new Set();
+    for (let c = 0; c < size; c++) {
+      const v = grid[r * size + c];
+      if (!v) return false;
+      if (seen.has(v)) return false;
+      seen.add(v);
+    }
+  }
+  for (let c = 0; c < size; c++) {
+    const seen = new Set();
+    for (let r = 0; r < size; r++) {
+      const v = grid[r * size + c];
+      if (!v) return false;
+      if (seen.has(v)) return false;
+      seen.add(v);
+    }
+  }
+  const [br, bc] = box;
+  for (let rs = 0; rs < size; rs += br) {
+    for (let cs = 0; cs < size; cs += bc) {
+      const seen = new Set();
+      for (let r = rs; r < rs + br; r++) {
+        for (let c = cs; c < cs + bc; c++) {
+          const v = grid[r * size + c];
+          if (!v) return false;
+          if (seen.has(v)) return false;
+          seen.add(v);
+        }
+      }
+    }
   }
   return true;
 }
@@ -2174,6 +2230,10 @@ function shuffle(arr) {
 function randInt(min, max) {
   if (max <= min) return min;
   return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function isFilled(grid) {
+  return grid.every((v) => v !== 0);
 }
 
 function generateSliding(size) {
