@@ -765,6 +765,7 @@ function createBrickBreaker() {
     bricks: [],
     score: 0,
     level: 1,
+    failed: false,
   };
 
   function reset(level = 1) {
@@ -780,9 +781,17 @@ function createBrickBreaker() {
       }
     }
     state.score = 0;
+    state.failed = false;
   }
 
   function update(dt, keys, settings, store) {
+    if (state.failed) {
+      if (keys.has('r')) {
+        reset(state.level);
+        hideOverlay();
+      }
+      return;
+    }
     if (keys.has('arrowleft')) state.paddle.x -= 320 * dt;
     if (keys.has('arrowright')) state.paddle.x += 320 * dt;
     state.paddle.x = Math.max(20, Math.min(820, state.paddle.x));
@@ -811,7 +820,11 @@ function createBrickBreaker() {
       }
     }
 
-    if (b.y > 520) reset();
+    if (b.y > 520) {
+      state.failed = true;
+      showOverlay(i18n.t('fail'), i18n.t('fail_breaker'), { showNext: false, showExit: true });
+      return;
+    }
     if (keys.has('r')) reset();
     const progress = Math.floor((state.score / (state.bricks.length * 10)) * 100);
     store.saveRecord('breaker', Math.max(store.getRecord('breaker'), progress));
@@ -821,12 +834,7 @@ function createBrickBreaker() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawSky(ctx, '#fff6fa', settings.pixel);
 
-    if (settings.pixel) {
-      drawPixelSprite(ctx, state.paddle.x, 440, spritePaddle, 4, ['#e2e8f0']);
-    } else {
-      ctx.fillStyle = '#e2e8f0';
-      ctx.fillRect(state.paddle.x, 440, state.paddle.w, 12);
-    }
+    drawCutePaddle(ctx, state.paddle.x, 440, state.paddle.w, 12);
 
     if (settings.pixel) {
       drawPixelSprite(ctx, state.ball.x - 8, state.ball.y - 8, spriteBall, 2, ['#38bdf8', '#0f172a']);
@@ -989,13 +997,13 @@ function createSokoban() {
           drawBlock(ctx, px, py, tile, '#0f172a', '#111827');
         }
         if (cell === '.' || cell === '*' || cell === '+') {
-          drawDot(ctx, px + tile / 2, py + tile / 2, '#facc15', 10);
+          drawCarrot(ctx, px + tile / 2, py + tile / 2, tile * 0.4);
         }
         if (cell === '$' || cell === '*') {
           drawCrate(ctx, px + 3, py + 3, tile - 6);
         }
         if (cell === '@' || cell === '+') {
-          drawPlayer(ctx, px + 4, py + 4, tile - 8);
+          drawRabbit(ctx, px + tile / 2, py + tile / 2, tile * 0.38);
         }
       }
     }
@@ -1400,7 +1408,7 @@ function createConnectDots() {
     [
       { x: 260, y: 200 }, { x: 220, y: 160 }, { x: 260, y: 140 }, { x: 320, y: 160 }, { x: 360, y: 200 },
       { x: 400, y: 160 }, { x: 460, y: 140 }, { x: 500, y: 160 }, { x: 460, y: 200 }, { x: 420, y: 240 },
-      { x: 380, y: 280 }, { x: 360, y: 320 }, { x: 340, y: 280 }, { x: 300, y: 240 }, { x: 260, y: 200 },
+      { x: 380, y: 280 }, { x: 360, y: 320 }, { x: 340, y: 280 }, { x: 300, y: 240 },
     ],
     // 蘑菇 20点
     [
@@ -1458,7 +1466,8 @@ function createConnectDots() {
     const pts = levels[state.level - 1];
     if (state.index >= pts.length) return;
     const target = pts[state.index];
-    if (Math.hypot(x - target.x, y - target.y) < 20) {
+    const hitRadius = state.shape === '爱心' ? 52 : state.shape === '星星' ? 28 : 24;
+    if (Math.hypot(x - target.x, y - target.y) < hitRadius) {
       if (state.index > 0) state.lines.push([pts[state.index - 1], target]);
       state.index += 1;
     }
@@ -1481,7 +1490,8 @@ function createConnectDots() {
       if (state.shape === '星星') {
         drawStar(ctx, p.x, p.y, 22, filled ? '#facc15' : '#94a3b8');
       } else if (state.shape === '爱心') {
-        drawHeart(ctx, p.x, p.y, 24, filled ? '#f472b6' : '#94a3b8');
+        drawHeart(ctx, p.x, p.y, 26, filled ? '#f472b6' : '#94a3b8');
+        drawDot(ctx, p.x, p.y, filled ? '#fb7185' : '#cbd5f5', 5);
       } else {
         drawMushroomIcon(ctx, p.x, p.y, 20, filled ? '#ef4444' : '#94a3b8');
       }
@@ -1816,6 +1826,17 @@ function createI18n() {
       title: 'ベビーゲームハウス',
       subtitle: 'ローカルレトロゲーム原型集 · HTML5 Canvas',
       settings: '設定',
+      settings_title: '設定',
+      volume_label: '音量',
+      pixel_label: 'ピクセル描画',
+      close_btn: '閉じる',
+      back_btn: 'メニューへ戻る',
+      restart_btn: 'リスタート',
+      next_btn: '次へ',
+      exit_btn: '退出',
+      hint_controls: 'キーボード：矢印 / Z / X / Rリセット / Pポーズ',
+      overlay_title: 'ステージ終了',
+      overlay_text: 'ヒント',
       lang_btn: '言語',
       level_label: 'レベル',
       start_btn: 'スタート',
@@ -1849,6 +1870,7 @@ function createI18n() {
       fail_lives: 'ライフがなくなりました。リトライしてね。',
       fail_moves: '手数オーバー。もう一度！',
       fail_sudoku: '数独が間違っています。もう一度！',
+      fail_breaker: '落ちちゃった！「リスタート」で続けよう。',
       pass_level: '第 {n} ステージ クリア！',
       pass_shape: '{shape} を完成したよ！',
       need_mush: 'キノコが足りないよ。必要 {need}、今 {got}。',
@@ -1862,6 +1884,17 @@ function createI18n() {
       title: '宝贝游戏屋',
       subtitle: '本地复古游戏原型集合 · HTML5 Canvas',
       settings: '设置',
+      settings_title: '设置',
+      volume_label: '音量',
+      pixel_label: '像素风渲染',
+      close_btn: '关闭',
+      back_btn: '返回菜单',
+      restart_btn: '重开',
+      next_btn: '下一关',
+      exit_btn: '退出',
+      hint_controls: '键盘：方向键 / Z / X / R重开 / P暂停',
+      overlay_title: '关卡结束',
+      overlay_text: '提示',
       lang_btn: '语言',
       level_label: '关卡',
       start_btn: '开始',
@@ -1895,6 +1928,7 @@ function createI18n() {
       fail_lives: '生命耗尽，按“重开”重新开始。',
       fail_moves: '步数过多，按“重开”再试。',
       fail_sudoku: '数独答案有误，请再检查。',
+      fail_breaker: '掉下去了！按“重开”继续。',
       pass_level: '完成第 {n} 关！',
       pass_shape: '恭喜你完成了{shape}！',
       need_mush: '还需采集蘑菇 {need} 个，当前 {got} 个。',
@@ -1908,6 +1942,17 @@ function createI18n() {
       title: 'Baby Game House',
       subtitle: 'Local Retro Game Prototypes · HTML5 Canvas',
       settings: 'Settings',
+      settings_title: 'Settings',
+      volume_label: 'Volume',
+      pixel_label: 'Pixel Rendering',
+      close_btn: 'Close',
+      back_btn: 'Back to Menu',
+      restart_btn: 'Restart',
+      next_btn: 'Next',
+      exit_btn: 'Exit',
+      hint_controls: 'Keyboard: Arrows / Z / X / R reset / P pause',
+      overlay_title: 'Stage Complete',
+      overlay_text: 'Hint',
       lang_btn: 'Language',
       level_label: 'Level',
       start_btn: 'Start',
@@ -1941,6 +1986,7 @@ function createI18n() {
       fail_lives: 'Out of lives. Try again.',
       fail_moves: 'Too many moves. Try again.',
       fail_sudoku: 'Sudoku is incorrect. Try again.',
+      fail_breaker: 'Ball dropped! Press "Restart" to continue.',
       pass_level: 'Stage {n} cleared!',
       pass_shape: 'You completed the {shape}!',
       need_mush: 'Need {need} mushrooms, now {got}.',
@@ -1958,9 +2004,16 @@ function createI18n() {
   }
   function apply() {
     document.querySelectorAll('[data-i18n]').forEach((el) => {
-      el.textContent = t(el.dataset.i18n);
+      const text = t(el.dataset.i18n);
+      if (el.childNodes.length && el.childNodes[0].nodeType === Node.TEXT_NODE) {
+        el.childNodes[0].nodeValue = text;
+      } else {
+        el.textContent = text;
+      }
     });
     document.getElementById('settings-btn').textContent = t('settings');
+    document.title = t('title');
+    document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang === 'ja' ? 'ja' : 'en';
     document.querySelectorAll('[data-i18n-record]').forEach((el) => {
       const key = el.dataset.record;
       const value = store.getRecord(key);
@@ -2026,10 +2079,108 @@ function drawPlayer(ctx, x, y, size) {
   ctx.fillRect(x + 4, y + 4, size - 8, size - 8);
 }
 
+function drawRabbit(ctx, x, y, r) {
+  ctx.fillStyle = '#f8fafc';
+  ctx.beginPath();
+  ctx.ellipse(x - r * 0.38, y - r * 0.95, r * 0.24, r * 0.7, -0.2, 0, Math.PI * 2);
+  ctx.ellipse(x + r * 0.38, y - r * 0.95, r * 0.24, r * 0.7, 0.2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#fca5a5';
+  ctx.beginPath();
+  ctx.ellipse(x - r * 0.38, y - r * 0.98, r * 0.1, r * 0.45, -0.2, 0, Math.PI * 2);
+  ctx.ellipse(x + r * 0.38, y - r * 0.98, r * 0.1, r * 0.45, 0.2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#f8fafc';
+  ctx.beginPath();
+  ctx.ellipse(x, y + r * 0.35, r * 0.6, r * 0.55, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(x, y - r * 0.2, r * 0.5, r * 0.45, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#e2e8f0';
+  ctx.beginPath();
+  ctx.ellipse(x, y + r * 0.55, r * 0.28, r * 0.2, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#0f172a';
+  ctx.beginPath();
+  ctx.arc(x - r * 0.18, y - r * 0.25, r * 0.07, 0, Math.PI * 2);
+  ctx.arc(x + r * 0.18, y - r * 0.25, r * 0.07, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#f472b6';
+  ctx.beginPath();
+  ctx.arc(x, y - r * 0.08, r * 0.08, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawCarrot(ctx, x, y, r) {
+  ctx.fillStyle = '#22c55e';
+  ctx.beginPath();
+  ctx.moveTo(x, y - r * 1.05);
+  ctx.lineTo(x - r * 0.25, y - r * 0.55);
+  ctx.lineTo(x + r * 0.25, y - r * 0.55);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = '#fb923c';
+  ctx.beginPath();
+  ctx.ellipse(x, y + r * 0.05, r * 0.38, r * 0.62, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#f97316';
+  ctx.beginPath();
+  ctx.ellipse(x, y + r * 0.15, r * 0.28, r * 0.5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#fdba74';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(x - r * 0.12, y - r * 0.1);
+  ctx.lineTo(x + r * 0.06, y + r * 0.12);
+  ctx.moveTo(x - r * 0.16, y + r * 0.18);
+  ctx.lineTo(x + r * 0.04, y + r * 0.35);
+  ctx.stroke();
+}
+
 function drawDot(ctx, x, y, color, r = 6) {
   ctx.fillStyle = color;
   ctx.beginPath();
   ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawCutePaddle(ctx, x, y, w, h) {
+  const r = 6;
+  ctx.fillStyle = '#f8fafc';
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.strokeStyle = '#e2e8f0';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  const cx = x + w / 2;
+  const cy = y + h / 2;
+  ctx.fillStyle = '#0f172a';
+  ctx.beginPath();
+  ctx.arc(cx - 16, cy, 2.2, 0, Math.PI * 2);
+  ctx.arc(cx + 16, cy, 2.2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#0f172a';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(cx, cy + 4, 6, 0, Math.PI);
+  ctx.stroke();
+  ctx.fillStyle = '#fda4af';
+  ctx.beginPath();
+  ctx.arc(cx - 26, cy + 3, 3, 0, Math.PI * 2);
+  ctx.arc(cx + 26, cy + 3, 3, 0, Math.PI * 2);
   ctx.fill();
 }
 

@@ -148,20 +148,20 @@
         <div class="stage-header">
           <div class="left">
             <span id="game-title">游戏</span>
-            <span class="hint">键盘：方向键 / Z / X / R重开 / P暂停</span>
+            <span class="hint" data-i18n="hint_controls">键盘：方向键 / Z / X / R重开 / P暂停</span>
           </div>
           <div class="right">
-            <button id="back-btn">返回菜单</button>
+            <button id="back-btn" data-i18n="back_btn">返回菜单</button>
           </div>
         </div>
         <div class="overlay hidden" id="overlay">
           <div class="overlay-card">
-            <h3 id="overlay-title">关卡结束</h3>
-            <p id="overlay-text">提示</p>
+            <h3 id="overlay-title" data-i18n="overlay_title">关卡结束</h3>
+            <p id="overlay-text" data-i18n="overlay_text">提示</p>
             <div class="overlay-actions">
-              <button id="restart-btn">重开</button>
-              <button id="next-btn">下一关</button>
-              <button id="exit-btn">退出</button>
+              <button id="restart-btn" data-i18n="restart_btn">重开</button>
+              <button id="next-btn" data-i18n="next_btn">下一关</button>
+              <button id="exit-btn" data-i18n="exit_btn">退出</button>
             </div>
           </div>
         </div>
@@ -171,15 +171,15 @@
 
       <section class="settings hidden" id="settings">
         <div class="settings-card">
-          <h3>设置</h3>
-          <label class="row">音量
+          <h3 data-i18n="settings_title">设置</h3>
+          <label class="row"><span data-i18n="volume_label">音量</span>
             <input type="range" id="volume" min="0" max="100" value="40" />
           </label>
-          <label class="row">像素风渲染
+          <label class="row"><span data-i18n="pixel_label">像素风渲染</span>
             <input type="checkbox" id="pixel-toggle" checked />
           </label>
           <div class="row actions">
-            <button id="close-settings">关闭</button>
+            <button id="close-settings" data-i18n="close_btn">关闭</button>
           </div>
         </div>
       </section>
