@@ -159,6 +159,16 @@ canvas.addEventListener('click', (e) => {
   activeGame.onClick(x, y);
 });
 
+canvas.addEventListener('pointermove', (e) => {
+  if (!activeGame || !activeGame.onPointer) return;
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const x = (e.clientX - rect.left) * scaleX;
+  const y = (e.clientY - rect.top) * scaleY;
+  activeGame.onPointer(x, y);
+});
+
 function showOverlay(title, text, options = {}) {
   overlayTitle.textContent = title;
   overlayText.textContent = text;
@@ -858,7 +868,11 @@ function createBrickBreaker() {
     drawHud(ctx, `得分: ${state.score}  进度: ${Math.floor((state.score / (state.bricks.length * 10)) * 100)}%`);
   }
 
-  return { name: state.name, tips: state.tips, reset, update, render };
+  function onPointer(x) {
+    state.paddle.x = Math.max(20, Math.min(820, x - state.paddle.w / 2));
+  }
+
+  return { name: state.name, tips: state.tips, reset, update, render, onPointer };
 }
 
 function createSokoban() {

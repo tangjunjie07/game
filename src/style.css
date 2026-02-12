@@ -220,10 +220,46 @@ body.in-game .park-strip {
   left: 50%;
   top: 8px;
   transform: translateX(-50%);
-  font-size: 26px;
-  opacity: 0.9;
+  width: 260px;
+  height: 40px;
   z-index: 2;
 }
+
+.cloud {
+  position: absolute;
+  top: 6px;
+  width: 60px;
+  height: 24px;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 3px 10px rgba(255, 122, 182, 0.2);
+}
+
+.cloud::before,
+.cloud::after {
+  content: "";
+  position: absolute;
+  background: #ffffff;
+  border-radius: 50%;
+}
+
+.cloud::before {
+  width: 26px;
+  height: 26px;
+  left: 8px;
+  top: -12px;
+}
+
+.cloud::after {
+  width: 32px;
+  height: 32px;
+  left: 26px;
+  top: -16px;
+}
+
+.cloud-1 { left: 0; opacity: 0.95; }
+.cloud-2 { left: 90px; opacity: 0.9; }
+.cloud-3 { left: 180px; opacity: 0.85; }
 
 @keyframes cloud-float {
   0%, 100% { transform: translateY(0); }
