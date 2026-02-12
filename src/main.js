@@ -31,6 +31,7 @@ window.addEventListener('keyup', (e) => {
 let activeGame = null;
 let lastTime = 0;
 let paused = false;
+let pointerActive = false;
 
 const audio = createAudio();
 const store = createStore();
@@ -113,6 +114,9 @@ function startGame(key) {
   document.body.classList.add('in-game');
   menu.classList.add('hidden');
   stage.classList.remove('hidden');
+  if (document.fullscreenEnabled && !document.fullscreenElement) {
+    document.documentElement.requestFullscreen?.().catch(() => {});
+  }
   activeGame.reset(level);
   lastTime = performance.now();
   requestAnimationFrame(loop);
@@ -125,6 +129,9 @@ function stopGame() {
   document.body.classList.remove('in-game');
   menu.classList.remove('hidden');
   stage.classList.add('hidden');
+  if (document.fullscreenElement && document.exitFullscreen) {
+    document.exitFullscreen().catch(() => {});
+  }
 }
 
 function loop(ts) {
@@ -159,14 +166,34 @@ canvas.addEventListener('click', (e) => {
   activeGame.onClick(x, y);
 });
 
-canvas.addEventListener('pointermove', (e) => {
+canvas.addEventListener('pointerdown', (e) => {
   if (!activeGame || !activeGame.onPointer) return;
+  pointerActive = true;
+  canvas.setPointerCapture?.(e.pointerId);
   const rect = canvas.getBoundingClientRect();
   const scaleX = canvas.width / rect.width;
   const scaleY = canvas.height / rect.height;
   const x = (e.clientX - rect.left) * scaleX;
   const y = (e.clientY - rect.top) * scaleY;
   activeGame.onPointer(x, y);
+});
+
+canvas.addEventListener('pointermove', (e) => {
+  if (!activeGame || !activeGame.onPointer || !pointerActive) return;
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const x = (e.clientX - rect.left) * scaleX;
+  const y = (e.clientY - rect.top) * scaleY;
+  activeGame.onPointer(x, y);
+});
+
+canvas.addEventListener('pointerup', () => {
+  pointerActive = false;
+});
+
+canvas.addEventListener('pointercancel', () => {
+  pointerActive = false;
 });
 
 function showOverlay(title, text, options = {}) {

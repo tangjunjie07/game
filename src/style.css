@@ -327,6 +327,7 @@ canvas {
   background: #fff6fa;
   border-radius: 6px;
   border: 2px solid var(--border);
+  touch-action: none;
 }
 
 .tips {
