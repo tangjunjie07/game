@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>80年代经典单机游戏合集</title>
+    <link rel="stylesheet" href="src/style.css" />
+  </head>
+  <body>
+    <main id="app">
+      <header class="app-header">
+        <h1>80年代经典单机游戏合集</h1>
+        <p>本地复古游戏原型集合 · HTML5 Canvas</p>
+        <div class="top-actions">
+          <button id="settings-btn">设置</button>
+        </div>
+      </header>
+
+      <section class="menu">
+        <div class="card" data-game="mario">
+          <h2>蘑菇冒险</h2>
+          <p>横版跑跳，采蘑菇原型</p>
+          <div class="meta">
+            <label>关卡
+              <select class="level-select" data-game="mario">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+              </select>
+            </label>
+            <span class="record" data-record="mario">记录：0%</span>
+          </div>
+          <button>开始</button>
+        </div>
+        <div class="card" data-game="contra">
+          <h2>魂斗罗·迷你版</h2>
+          <p>横版射击，双向射击原型</p>
+          <div class="meta">
+            <label>关卡
+              <select class="level-select" data-game="contra">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+              </select>
+            </label>
+            <span class="record" data-record="contra">记录：0%</span>
+          </div>
+          <button>开始</button>
+        </div>
+        <div class="card" data-game="breaker">
+          <h2>打砖块</h2>
+          <p>反弹球经典原型</p>
+          <div class="meta">
+            <label>关卡
+              <select class="level-select" data-game="breaker">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+              </select>
+            </label>
+            <span class="record" data-record="breaker">记录：0%</span>
+          </div>
+          <button>开始</button>
+        </div>
+      </section>
+
+      <section class="stage hidden" id="stage">
+        <div class="stage-header">
+          <div class="left">
+            <span id="game-title">游戏</span>
+            <span class="hint">键盘：方向键 / Z / X / R重开 / P暂停</span>
+          </div>
+          <div class="right">
+            <button id="back-btn">返回菜单</button>
+          </div>
+        </div>
+        <div class="overlay hidden" id="overlay">
+          <div class="overlay-card">
+            <h3 id="overlay-title">关卡结束</h3>
+            <p id="overlay-text">提示</p>
+            <div class="overlay-actions">
+              <button id="restart-btn">重开</button>
+              <button id="next-btn">下一关</button>
+              <button id="continue-btn">继续</button>
+              <button id="exit-btn">退出</button>
+            </div>
+          </div>
+        </div>
+        <canvas id="game" width="960" height="540"></canvas>
+        <div class="tips" id="tips"></div>
+      </section>
+
+      <section class="settings hidden" id="settings">
+        <div class="settings-card">
+          <h3>设置</h3>
+          <label class="row">音量
+            <input type="range" id="volume" min="0" max="100" value="40" />
+          </label>
+          <label class="row">像素风渲染
+            <input type="checkbox" id="pixel-toggle" checked />
+          </label>
+          <div class="row actions">
+            <button id="close-settings">关闭</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>
