@@ -3,64 +3,144 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>80年代经典单机游戏合集</title>
+    <title>宝贝游戏屋</title>
     <link rel="stylesheet" href="src/style.css" />
   </head>
   <body>
     <main id="app">
       <header class="app-header">
-        <h1>80年代经典单机游戏合集</h1>
-        <p>本地复古游戏原型集合 · HTML5 Canvas</p>
+        <h1 data-i18n="title">宝贝游戏屋</h1>
+        <p data-i18n="subtitle">本地复古游戏原型集合 · HTML5 Canvas</p>
         <div class="top-actions">
           <button id="settings-btn">设置</button>
+          <select id="lang-select" aria-label="Language">
+            <option value="ja">日本語</option>
+            <option value="zh">中文</option>
+            <option value="en">English</option>
+          </select>
         </div>
       </header>
 
       <section class="menu">
         <div class="card" data-game="mario">
-          <h2>蘑菇冒险</h2>
-          <p>横版跑跳，采蘑菇原型</p>
+          <h2 data-i18n="mario_title">蘑菇冒险</h2>
+          <p data-i18n="mario_desc">宝贝的跑跳小冒险，收集蘑菇！</p>
           <div class="meta">
-            <label>关卡
+            <label data-i18n="level_label">关卡
               <select class="level-select" data-game="mario">
                 <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
               </select>
             </label>
-            <span class="record" data-record="mario">记录：0%</span>
+            <span class="record" data-record="mario" data-i18n-record>记录：0%</span>
           </div>
-          <button>开始</button>
+          <button class="start-btn" data-i18n="start_btn">开始</button>
         </div>
         <div class="card" data-game="contra">
-          <h2>魂斗罗·迷你版</h2>
-          <p>横版射击，双向射击原型</p>
+          <h2 data-i18n="contra_title">魂斗罗·迷你版</h2>
+          <p data-i18n="contra_desc">宝贝小战士，勇敢向前！</p>
           <div class="meta">
-            <label>关卡
+            <label data-i18n="level_label">关卡
               <select class="level-select" data-game="contra">
                 <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
               </select>
             </label>
-            <span class="record" data-record="contra">记录：0%</span>
+            <span class="record" data-record="contra" data-i18n-record>记录：0%</span>
           </div>
-          <button>开始</button>
+          <button class="start-btn" data-i18n="start_btn">开始</button>
         </div>
         <div class="card" data-game="breaker">
-          <h2>打砖块</h2>
-          <p>反弹球经典原型</p>
+          <h2 data-i18n="breaker_title">打砖块</h2>
+          <p data-i18n="breaker_desc">小球弹呀弹，砖块咚咚掉！</p>
           <div class="meta">
-            <label>关卡
+            <label data-i18n="level_label">关卡
               <select class="level-select" data-game="breaker">
                 <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
               </select>
             </label>
-            <span class="record" data-record="breaker">记录：0%</span>
+            <span class="record" data-record="breaker" data-i18n-record>记录：0%</span>
           </div>
-          <button>开始</button>
+          <button class="start-btn" data-i18n="start_btn">开始</button>
+        </div>
+        <div class="card" data-game="sokoban">
+          <h2 data-i18n="sokoban_title">推箱子</h2>
+          <p data-i18n="sokoban_desc">动动小脑筋，把箱子推到星星点！</p>
+          <div class="meta">
+            <label data-i18n="level_label">关卡
+              <select class="level-select" data-game="sokoban">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+              </select>
+            </label>
+            <span class="record" data-record="sokoban" data-i18n-record>记录：0%</span>
+          </div>
+          <button class="start-btn" data-i18n="start_btn">开始</button>
+        </div>
+        <div class="card" data-game="sudoku">
+          <h2 data-i18n="sudoku_title">数独</h2>
+          <p data-i18n="sudoku_desc">数字小魔法，填满每一格！</p>
+          <div class="meta">
+            <label data-i18n="level_label">关卡
+              <select class="level-select" data-game="sudoku">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+              </select>
+            </label>
+            <span class="record" data-record="sudoku" data-i18n-record>记录：0%</span>
+          </div>
+          <button class="start-btn" data-i18n="start_btn">开始</button>
+        </div>
+        <div class="card" data-game="memory">
+          <h2 data-i18n="memory_title">翻牌记忆</h2>
+          <p data-i18n="memory_desc">记忆力挑战，找出相同小图案！</p>
+          <div class="meta">
+            <label data-i18n="level_label">关卡
+              <select class="level-select" data-game="memory">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+              </select>
+            </label>
+            <span class="record" data-record="memory" data-i18n-record>记录：0%</span>
+          </div>
+          <button class="start-btn" data-i18n="start_btn">开始</button>
+        </div>
+        <div class="card" data-game="sliding">
+          <h2 data-i18n="sliding_title">数字华容道</h2>
+          <p data-i18n="sliding_desc">把数字排整齐，宝贝最聪明！</p>
+          <div class="meta">
+            <label data-i18n="level_label">关卡
+              <select class="level-select" data-game="sliding">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+              </select>
+            </label>
+            <span class="record" data-record="sliding" data-i18n-record>记录：0%</span>
+          </div>
+          <button class="start-btn" data-i18n="start_btn">开始</button>
+        </div>
+        <div class="card" data-game="connect">
+          <h2 data-i18n="connect_title">连线</h2>
+          <p data-i18n="connect_desc">跟着数字连一连，完成可爱图形！</p>
+          <div class="meta">
+            <label data-i18n="level_label">关卡
+              <select class="level-select" data-game="connect">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+              </select>
+            </label>
+            <span class="record" data-record="connect" data-i18n-record>记录：0%</span>
+          </div>
+          <button class="start-btn" data-i18n="start_btn">开始</button>
         </div>
       </section>
 
@@ -81,7 +161,6 @@
             <div class="overlay-actions">
               <button id="restart-btn">重开</button>
               <button id="next-btn">下一关</button>
-              <button id="continue-btn">继续</button>
               <button id="exit-btn">退出</button>
             </div>
           </div>
@@ -104,6 +183,14 @@
           </div>
         </div>
       </section>
+      <div class="park-strip" aria-hidden="true">
+        <div class="park-track">
+          🎡 🎠 🎈 🐻 🍭 🎠 🎡 🎠 🎈 🐰 🍬 🎠 🎡 🎈 🐻 🍭
+        </div>
+        <div class="park-stars">✨ ✨ ✨</div>
+        <div class="park-wheel"></div>
+        <div class="park-clouds">☁️ ☁️ ☁️</div>
+      </div>
     </main>
 
     <script type="module" src="src/main.js"></script>

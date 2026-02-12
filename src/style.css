@@ -4,13 +4,13 @@
 }
 
 :root {
-  --bg: #0f111a;
-  --card: #1a1f2b;
-  --accent: #ffb703;
-  --accent-2: #fb8500;
-  --text: #f1f5f9;
-  --muted: #94a3b8;
-  --border: #2a3142;
+  --bg: #fff1f7;
+  --card: #ffffff;
+  --accent: #ff7ab6;
+  --accent-2: #ff9ccf;
+  --text: #5b2a3c;
+  --muted: #a36b86;
+  --border: #ffd0e6;
 }
 
 * {
@@ -21,7 +21,10 @@ body {
   margin: 0;
   font-family: "PressStart", "Courier New", monospace;
   color: var(--text);
-  background: radial-gradient(1200px 600px at 20% -10%, #243045, #0f111a 60%);
+  background:
+    radial-gradient(900px 500px at 10% -10%, #ffe0ef, transparent 60%),
+    radial-gradient(800px 500px at 90% 0%, #ffd8ec, transparent 60%),
+    linear-gradient(180deg, #fff6fa, #ffeaf4 60%, #fff6fa);
   min-height: 100vh;
 }
 
@@ -53,8 +56,19 @@ body {
 
 .top-actions button {
   padding: 8px 12px;
-  border: 1px solid var(--border);
-  background: #111624;
+  border: 2px solid var(--border);
+  background: #fff0f7;
+  color: var(--text);
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 11px;
+}
+
+.top-actions select {
+  padding: 8px 10px;
+  border: 2px solid var(--border);
+  background: #fff0f7;
   color: var(--text);
   border-radius: 6px;
   cursor: pointer;
@@ -69,14 +83,15 @@ body {
 }
 
 .card {
-  background: linear-gradient(160deg, #1f2636, #131824);
-  border: 1px solid var(--border);
+  background: linear-gradient(160deg, #ffffff, #fff0f7);
+  border: 2px solid var(--border);
   padding: 16px;
   border-radius: 8px;
   display: flex;
   flex-direction: column;
   gap: 12px;
   transition: transform 0.2s ease, border-color 0.2s ease;
+  box-shadow: 0 8px 20px rgba(255, 122, 182, 0.15);
 }
 
 .card:hover {
@@ -106,12 +121,123 @@ body {
 
 .card select {
   margin-left: 6px;
-  background: #111624;
+  background: #fff0f7;
   color: var(--text);
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
   border-radius: 4px;
   font-family: inherit;
   font-size: 10px;
+}
+
+.card label {
+  color: var(--text);
+}
+
+.settings-card input[type='range'] {
+  accent-color: var(--accent);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: -10% -10% auto -10%;
+  height: 320px;
+  background: radial-gradient(80px 80px at 20% 40%, rgba(255, 122, 182, 0.35), transparent 60%),
+    radial-gradient(120px 120px at 70% 30%, rgba(255, 193, 224, 0.45), transparent 60%),
+    radial-gradient(140px 140px at 50% 60%, rgba(255, 220, 236, 0.6), transparent 65%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+#app {
+  position: relative;
+  z-index: 2;
+}
+
+.park-strip {
+  margin-top: 18px;
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #fff0f7, #ffe6f2);
+  overflow: hidden;
+  padding: 18px 0;
+  height: 120px;
+  position: relative;
+}
+
+.park-track {
+  display: inline-block;
+  white-space: nowrap;
+  animation: park-move 14s linear infinite;
+  font-size: 26px;
+  padding-left: 100%;
+}
+
+@keyframes park-move {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+body.in-game .park-strip {
+  display: none;
+}
+
+.park-wheel {
+  position: absolute;
+  right: 18%;
+  bottom: 12px;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: 3px solid #ff9ccf;
+  background: radial-gradient(circle at center, #fff 30%, transparent 31%);
+  animation: spin 6s linear infinite;
+  box-shadow: 0 6px 18px rgba(255, 122, 182, 0.3);
+  z-index: 2;
+}
+
+.park-wheel::after {
+  content: "🎡";
+  position: absolute;
+  inset: -2px;
+  display: grid;
+  place-items: center;
+  font-size: 26px;
+}
+
+.park-stars {
+  position: absolute;
+  left: 10%;
+  bottom: 16px;
+  font-size: 22px;
+  color: #facc15;
+  animation: twinkle 3s ease-in-out infinite;
+  z-index: 2;
+}
+
+.park-clouds {
+  position: absolute;
+  left: 50%;
+  top: 8px;
+  transform: translateX(-50%);
+  font-size: 26px;
+  opacity: 0.9;
+  z-index: 2;
+}
+
+@keyframes cloud-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
 }
 
 .card button {
@@ -119,7 +245,7 @@ body {
   padding: 10px 12px;
   border: none;
   background: var(--accent);
-  color: #1b1400;
+  color: #fff;
   font-family: inherit;
   font-size: 12px;
   cursor: pointer;
@@ -128,10 +254,10 @@ body {
 
 .stage {
   margin-top: 20px;
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
   border-radius: 8px;
   padding: 12px;
-  background: #0c0f18;
+  background: #fff7fb;
   position: relative;
 }
 
@@ -151,7 +277,7 @@ body {
 .stage-header button {
   padding: 8px 10px;
   border: 1px solid var(--border);
-  background: #111624;
+  background: #fff0f7;
   color: var(--text);
   border-radius: 6px;
   cursor: pointer;
@@ -162,9 +288,9 @@ body {
 canvas {
   width: 100%;
   height: auto;
-  background: #0b1020;
+  background: #fff6fa;
   border-radius: 6px;
-  border: 1px solid #1d2538;
+  border: 2px solid var(--border);
 }
 
 .tips {
@@ -176,7 +302,7 @@ canvas {
 .overlay {
   position: absolute;
   inset: 52px 12px 42px 12px;
-  background: rgba(3, 7, 18, 0.72);
+  background: rgba(255, 207, 230, 0.72);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -193,8 +319,8 @@ canvas {
 }
 
 .overlay-card {
-  background: linear-gradient(160deg, #1f2636, #131824);
-  border: 1px solid var(--border);
+  background: linear-gradient(160deg, #ffffff, #fff0f7);
+  border: 2px solid var(--border);
   padding: 18px;
   border-radius: 8px;
   text-align: center;
@@ -223,7 +349,7 @@ canvas {
   padding: 8px 12px;
   border: none;
   background: var(--accent);
-  color: #1b1400;
+  color: #fff;
   font-family: inherit;
   font-size: 11px;
   cursor: pointer;
@@ -233,7 +359,7 @@ canvas {
 .settings {
   position: fixed;
   inset: 0;
-  background: rgba(3, 7, 18, 0.72);
+  background: rgba(255, 207, 230, 0.72);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -241,8 +367,8 @@ canvas {
 }
 
 .settings-card {
-  background: linear-gradient(160deg, #1f2636, #131824);
-  border: 1px solid var(--border);
+  background: linear-gradient(160deg, #ffffff, #fff0f7);
+  border: 2px solid var(--border);
   padding: 18px;
   border-radius: 8px;
   width: min(360px, 90%);
@@ -275,7 +401,7 @@ canvas {
   padding: 8px 12px;
   border: none;
   background: var(--accent);
-  color: #1b1400;
+  color: #fff;
   font-family: inherit;
   font-size: 11px;
   cursor: pointer;
